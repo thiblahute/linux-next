@@ -424,17 +424,27 @@ static int vidioc_s_fmt(struct file *file, void *priv, struct v4l2_format *f)
 	pix_mp = &f->fmt.pix_mp;
 	if (ret)
 		return ret;
-	if (vb2_is_streaming(&ctx->vq_src) || vb2_is_streaming(&ctx->vq_dst)) {
-		v4l2_err(&dev->v4l2_dev, "%s queue busy\n", __func__);
-		ret = -EBUSY;
-		goto out;
-	}
+
 	if (f->type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
+
+		if (vb2_is_streaming(&ctx->vq_dst)) {
+			v4l2_err(&dev->v4l2_dev, "%s queue busy\n", __func__);
+			ret = -EBUSY;
+			goto out;
+		}
+
 		/* dst_fmt is validated by call to vidioc_try_fmt */
 		ctx->dst_fmt = find_format(f, MFC_FMT_RAW);
 		ret = 0;
 		goto out;
 	} else if (f->type == V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE) {
+
+		if (vb2_is_streaming(&ctx->vq_src)) {
+			v4l2_err(&dev->v4l2_dev, "%s queue busy\n", __func__);
+			ret = -EBUSY;
+			goto out;
+		}
+
 		/* src_fmt is validated by call to vidioc_try_fmt */
 		ctx->src_fmt = find_format(f, MFC_FMT_DEC);
 		ctx->codec_mode = ctx->src_fmt->codec_mode;
