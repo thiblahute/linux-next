@@ -1481,8 +1481,7 @@ static int s5p_jpeg_try_fmt_vid_cap(struct file *file, void *priv,
 	fmt = s5p_jpeg_find_format(ctx, f->fmt.pix.pixelformat,
 						FMT_TYPE_CAPTURE);
 	if (!fmt) {
-		v4l2_err(&ctx->jpeg->v4l2_dev,
-			 "Fourcc format (0x%08x) invalid.\n",
+		pr_debug("Fourcc format (0x%08x) invalid.\n",
 			 f->fmt.pix.pixelformat);
 		return -EINVAL;
 	}
